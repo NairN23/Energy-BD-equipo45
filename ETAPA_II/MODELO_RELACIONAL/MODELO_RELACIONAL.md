@@ -6,7 +6,7 @@ En este modelo se representan las tablas del sistema, sus claves primarias (PK),
 
 ## Archivos incluidos
 
-- `modelo_relacional.png`: imagen del modelo relacional.
-- `modelo_relacional.erdplus`: archivo editable generado en ERDPlus.
+- `Modelo-Relacional-3FN.png`: imagen del modelo relacional.
+- `Modelo-Relacional-3FN.erdplus`: archivo editable generado en ERDPlus.
 
-[Ver imagen del Modelo Relacional](modelo_relacional.png)
+![Modelo Relacional](Modelo-Relacional-3FN.png)
