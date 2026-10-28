@@ -1,5 +1,9 @@
-------INSERTAR TIPO_USUARIO---------
+USE EnergyBD;
+GO
 
+-- =========================================================
+-- 1. INSERTAR TIPO_USUARIO
+-- =========================================================
 INSERT INTO Tipo_usuario (nombre_tipoUsuario)
 VALUES
 ('Administrador'),
@@ -7,7 +11,9 @@ VALUES
 
 SELECT * FROM Tipo_usuario;
 
--------INSERTAR USUARIO-------
+-- =========================================================
+-- 2. INSERTAR USUARIO
+-- =========================================================
 INSERT INTO Usuario (nombre_usuario, correo, contrasenia, id_tipoUsuario)
 VALUES
 ('Administrador', 'admin@energy.com', 'Admin1234', 1),
@@ -21,8 +27,9 @@ VALUES
 
 SELECT * FROM Usuario;
 
-----------INSERTAR TELEFONO---------
-
+-- =========================================================
+-- 3. INSERTAR TELEFONO
+-- =========================================================
 INSERT INTO Telefono (nro_telefono, id_usuario)
 VALUES
 ('3794000001', 1),
@@ -36,8 +43,9 @@ VALUES
 
 SELECT * FROM Telefono;
 
---------INSERTAR MENSAJES----------
-
+-- =========================================================
+-- 4. INSERTAR MENSAJE
+-- =========================================================
 INSERT INTO Mensaje (nombre, correo, asunto, contenido, fecha_envio, telefono, id_usuario)
 VALUES
 ('Ana Lopez', 'ana.lopez@gmail.com', 'Consulta de producto',
@@ -67,9 +75,8 @@ VALUES
 SELECT * FROM Mensaje;
 
 -- =========================================================
--- CARGA DE CATEGORIAS
+-- 5. INSERTAR CATEGORIA
 -- =========================================================
-
 INSERT INTO Categoria (nombre_categoria, descripcion)
 VALUES
 ('Proteinas', 'Suplementos proteicos en polvo y barras'),
@@ -82,17 +89,15 @@ VALUES
 ('Colagenos', 'Colageno hidrolizado y suplementos articulares'),
 ('Accesorios', 'Shakers, dosificadores y articulos de entrenamiento');
 
--- Categoria dada de baja logica: sus productos no se muestran en el catalogo (RN06)
+-- Categoria inactiva
 INSERT INTO Categoria (nombre_categoria, descripcion, activa)
 VALUES ('Quemadores', 'Linea discontinuada', 0);
 
 SELECT * FROM Categoria;
 
-
 -- =========================================================
--- CARGA DE PRODUCTOS
+-- 6. INSERTAR PRODUCTO
 -- =========================================================
-
 INSERT INTO Producto (nombre_producto, descripcion, precio, stock, destacado, id_categoria)
 VALUES
 ('Whey Protein 1kg Vainilla', 'Proteina de suero concentrada, 24g de proteina por porcion', 45900.00, 40, 1, 1),
@@ -111,14 +116,16 @@ VALUES
 ('Combo Iniciacion Fitness', 'Whey Protein 1kg + Creatina 300g + Multivitaminico', 92500.00, 15, 1, 6),
 ('Combo Fuerza Total', 'Whey Protein 1kg + BCAA 300g + Pre-Workout 250g', 108400.00, 8, 1, 6);
 
--- Producto inactivo: no se muestra en el catalogo publico ni se agrega al carrito (RN02)
+-- Producto inactivo
 INSERT INTO Producto (nombre_producto, descripcion, precio, stock, activo, id_categoria)
 VALUES
 ('Termogenico Clasico 60 caps', 'Producto discontinuado por el proveedor', 21000.00, 0, 0, 10);
 
 SELECT * FROM Producto;
 
--- CARGAR DATO DE PROVINCIAS, CIUDADES Y DIRECCIONES
+-- =========================================================
+-- 7. INSERTAR PROVINCIA, CIUDAD, DIRECCION
+-- =========================================================
 INSERT INTO Provincia (nombre)
 VALUES
 ('Corrientes'),
@@ -151,36 +158,70 @@ VALUES
 ('Calle 7', '820', 'Plaza Paso', 2, 8),
 ('Av. Colon', '1420', 'Alberdi', 3, 11);
 
------------------------------------------------
--- POBLADO Y CONSULTA DE TABLA: Carrito
------------------------------------------------
+-- =========================================================
+-- 8. INSERTAR CARRITO
+-- =========================================================
 INSERT INTO Carrito (id_usuario) VALUES
-(1),  -- Carrito 1 para Administrador
-(2),  -- Carrito 2 para Ana Lopez
-(3),  -- Carrito 3 para Juan Perez
-(4),  -- Carrito 4 para Maria Gomez
-(5),  -- Carrito 5 para Pedro Fernandez
-(6),  -- Carrito 6 para Sofia Martinez
-(7),  -- Carrito 7 para Carlos Romero
-(8),  -- Carrito 8 para Lucia Sanchez
-(2),  -- Carrito 9 (segundo carrito/histórico) para Ana Lopez
-(3);  -- Carrito 10 (segundo carrito/histórico) para Juan Perez
+(1),  -- Carrito 1
+(2),  -- Carrito 2
+(3),  -- Carrito 3
+(4),  -- Carrito 4
+(5),  -- Carrito 5
+(6),  -- Carrito 6
+(7),  -- Carrito 7
+(8),  -- Carrito 8
+(2),  -- Carrito 9
+(3);  -- Carrito 10
 
 SELECT * FROM Carrito;
 
------------------------------------------------
--- POBLADO Y CONSULTA DE TABLA: Pedido
------------------------------------------------
+-- =========================================================
+-- 9. INSERTAR PEDIDO
+-- =========================================================
 INSERT INTO Pedido (total, fecha_pedido, estado, id_direccion, id_carrito) VALUES
-(15400.50, '2026-09-01 10:30:00', 'Entregado',       1, 1),
-(8500.00,  '2026-09-03 14:15:00', 'Entregado',       2, 2),
-(23100.00, '2026-09-10 09:45:00', 'Enviado',         3, 3),
-(4200.75,  '2026-09-12 11:20:00', 'Pagado',          4, 4),
-(99900.00, '2026-09-15 16:00:00', 'En Preparación',  5, 5),
-(1250.00,  '2026-09-18 18:30:00', 'Pendiente',       6, 6),
-(34000.00, '2026-09-20 08:00:00', 'Entregado',       7, 7),
-(6700.00,  '2026-09-22 12:10:00', 'Cancelado',       8, 8),
-(18900.25, '2026-09-25 15:50:00', 'Pagado',          9, 9),
-(51200.00, '2026-09-28 19:05:00', 'Pendiente',       10, 10);
+(15400.50, '2026-09-01 10:30:00', 'Entregado',      1, 1),
+(8500.00,  '2026-09-03 14:15:00', 'Entregado',      2, 2),
+(23100.00, '2026-09-10 09:45:00', 'Enviado',        3, 3),
+(4200.75,  '2026-09-12 11:20:00', 'Pagado',         4, 4),
+(99900.00, '2026-09-15 16:00:00', 'En Preparación', 5, 5),
+(1250.00,  '2026-09-18 18:30:00', 'Pendiente',      6, 6),
+(34000.00, '2026-09-20 08:00:00', 'Entregado',      1, 7),
+(6700.00,  '2026-09-22 12:10:00', 'Cancelado',      2, 8),
+(18900.25, '2026-09-25 15:50:00', 'Pagado',         3, 9),
+(51200.00, '2026-09-28 19:05:00', 'Pendiente',      4, 10);
 
 SELECT * FROM Pedido;
+
+-- =========================================================
+-- 10. INSERTAR DETALLE_PEDIDO
+-- =========================================================
+INSERT INTO Detalle_pedido (id_pedido, id_producto, cantidad, precioUnitario) VALUES
+(1, 1, 1, 45900.00), 
+(1, 10, 1, 33400.00),
+(2, 4, 2, 3200.00),  
+(3, 14, 1, 92500.00),
+(4, 6, 1, 12400.00), 
+(5, 15, 1, 108400.00),
+(6, 4, 1, 3200.00),  
+(7, 10, 1, 33400.00),
+(8, 8, 1, 29800.00), 
+(9, 5, 1, 18700.00); 
+
+SELECT * FROM Detalle_pedido;
+
+-- =========================================================
+-- 11. INSERTAR PAGO
+-- =========================================================
+INSERT INTO Pago (comprobante_pago, fecha_acreditacion, metodoPago, estado, id_pedido) VALUES
+('CMP-20260901-001', '2026-09-01 10:35:00', 'Tarjeta Credito', 'Aprobado', 1),
+('CMP-20260903-002', '2026-09-03 14:20:00', 'Transferencia',   'Aprobado', 2),
+('CMP-20260910-003', '2026-09-10 09:50:00', 'Mercado Pago',    'Aprobado', 3),
+('CMP-20260912-004', '2026-09-12 11:25:00', 'Tarjeta Debito',  'Aprobado', 4),
+('CMP-20260915-005', '2026-09-15 16:10:00', 'Transferencia',   'Aprobado', 5),
+('CMP-20260918-006', '2026-09-18 18:35:00', 'Mercado Pago',    'Pendiente', 6),
+('CMP-20260920-007', '2026-09-20 08:05:00', 'Tarjeta Credito', 'Aprobado', 7),
+('CMP-20260922-008', '2026-09-22 12:15:00', 'Efectivo',        'Rechazado', 8),
+('CMP-20260925-009', '2026-09-25 15:55:00', 'Tarjeta Credito', 'Aprobado', 9),
+('CMP-20260928-010', '2026-09-28 19:10:00', 'Transferencia',   'Pendiente', 10);
+
+SELECT * FROM Pago;
