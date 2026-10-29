@@ -2,7 +2,12 @@ USE EnergyBD;
 GO
 
 -- ==========================================================
--- FUNCIÓN: TOTAL GASTADO POR UN USUARIO
+-- TEMA 1 - PROCEDIMIENTOS Y FUNCIONES ALMACENADAS
+-- ==========================================================
+
+
+-- ==========================================================
+-- 1. FUNCIÓN: TOTAL GASTADO POR UN USUARIO
 -- ==========================================================
 
 CREATE OR ALTER FUNCTION dbo.fn_TotalGastadoUsuario
@@ -29,15 +34,7 @@ GO
 
 
 -- ==========================================================
--- PRUEBA DE LA FUNCIÓN
--- ==========================================================
-
-SELECT dbo.fn_TotalGastadoUsuario(1) AS TotalGastado;
-GO
-
-
--- ==========================================================
--- PROCEDIMIENTO ALMACENADO: REGISTRAR UN PEDIDO
+-- 2. PROCEDIMIENTO: REGISTRAR UN PEDIDO
 -- ==========================================================
 
 CREATE OR ALTER PROCEDURE dbo.sp_RegistrarPedido
@@ -53,28 +50,27 @@ BEGIN
     DECLARE @total DECIMAL(10,2);
     DECLARE @id_pedido INT;
 
-    -- Obtener precio y stock del producto
     SELECT
         @precio = precio,
         @stock = stock
     FROM Producto
     WHERE id_producto = @id_producto;
 
-    -- Verificar que el producto exista
+    -- Validar existencia del producto
     IF @precio IS NULL
     BEGIN
         PRINT 'El producto no existe.';
         RETURN;
     END;
 
-    -- Verificar que la cantidad sea válida
+    -- Validar cantidad
     IF @cantidad <= 0
     BEGIN
         PRINT 'La cantidad debe ser mayor a cero.';
         RETURN;
     END;
 
-    -- Verificar que haya stock suficiente
+    -- Validar stock
     IF @stock < @cantidad
     BEGIN
         PRINT 'Stock insuficiente.';
@@ -84,7 +80,7 @@ BEGIN
     -- Calcular total
     SET @total = @precio * @cantidad;
 
-    -- Crear pedido
+    -- Registrar pedido
     INSERT INTO Pedido (
         total,
         fecha_pedido,
@@ -100,10 +96,9 @@ BEGIN
         @id_carrito
     );
 
-    -- Obtener ID del pedido creado
     SET @id_pedido = SCOPE_IDENTITY();
 
-    -- Crear detalle del pedido
+    -- Registrar detalle
     INSERT INTO Detalle_pedido (
         id_pedido,
         id_producto,
@@ -119,7 +114,7 @@ BEGIN
         @total
     );
 
-    -- Descontar stock
+    -- Actualizar stock
     UPDATE Producto
     SET stock = stock - @cantidad
     WHERE id_producto = @id_producto;
@@ -131,7 +126,15 @@ GO
 
 
 -- ==========================================================
--- PRUEBA DEL PROCEDIMIENTO
+-- 3. PRUEBA DE LA FUNCIÓN
+-- ==========================================================
+
+SELECT dbo.fn_TotalGastadoUsuario(1) AS TotalGastado;
+GO
+
+
+-- ==========================================================
+-- 4. PRUEBA EXITOSA DEL PROCEDIMIENTO
 -- ==========================================================
 
 EXEC dbo.sp_RegistrarPedido
@@ -142,13 +145,44 @@ EXEC dbo.sp_RegistrarPedido
 GO
 
 
--- ==========================================================
--- VERIFICACIÓN DE RESULTADOS
--- ==========================================================
-
+-- Verificación del resultado
 SELECT * FROM Pedido;
 SELECT * FROM Detalle_pedido;
 SELECT * FROM Producto;
+GO
 
-SELECT dbo.fn_TotalGastadoUsuario(1) AS TotalGastado;
+
+-- ==========================================================
+-- 5. PRUEBA FALLIDA: PRODUCTO INEXISTENTE
+-- ==========================================================
+
+EXEC dbo.sp_RegistrarPedido
+    @id_carrito = 1,
+    @id_direccion = 1,
+    @id_producto = 999,
+    @cantidad = 2;
+GO
+
+
+-- ==========================================================
+-- 6. PRUEBA FALLIDA: CANTIDAD INVÁLIDA
+-- ==========================================================
+
+EXEC dbo.sp_RegistrarPedido
+    @id_carrito = 1,
+    @id_direccion = 1,
+    @id_producto = 1,
+    @cantidad = 0;
+GO
+
+
+-- ==========================================================
+-- 7. PRUEBA FALLIDA: STOCK INSUFICIENTE
+-- ==========================================================
+
+EXEC dbo.sp_RegistrarPedido
+    @id_carrito = 1,
+    @id_direccion = 1,
+    @id_producto = 1,
+    @cantidad = 100;
 GO

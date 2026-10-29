@@ -268,3 +268,22 @@ La función `fn_TotalGastadoUsuario` permite obtener de manera reutilizable el t
 Por otra parte, el procedimiento `sp_RegistrarPedido` permite registrar un pedido junto con su detalle y actualizar automáticamente el stock del producto.
 
 El uso de estos mecanismos permite reducir la repetición de código, organizar las operaciones SQL y facilitar el mantenimiento del sistema.
+
+
+## Evidencias
+
+### Prueba exitosa
+
+![Prueba exitosa](evidencias/prueba_exitosa.png)
+
+### Error: producto inexistente
+
+![Producto inexistente](evidencias/error_producto_inexistente.png)
+
+### Error: cantidad inválida
+
+![Cantidad inválida](evidencias/error_cantidad_invalida.png)
+
+### Error: stock insuficiente
+
+![Stock insuficiente](evidencias/error_stock_insuficiente.png)
