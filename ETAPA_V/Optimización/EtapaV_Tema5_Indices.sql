@@ -2,7 +2,6 @@
 -- ETAPA V - TEMA 5: OPTIMIZACIÓN DE CONSULTAS MEDIANTE ÍNDICES
 -- Base de Datos: EnergyBD
 -- Motor: Microsoft SQL Server
--- Integrante: Juan María Mancedo
 -- =========================================================================
 
 USE EnergyBD;
@@ -29,7 +28,8 @@ GO
 PRINT '============================================================';
 PRINT 'CANTIDAD TOTAL DE PEDIDOS';
 PRINT '============================================================';
-SELECT COUNT_BIG(*) AS TotalPedidos FROM dbo.Pedido;
+SELECT COUNT_BIG(*) AS TotalPedidos
+FROM dbo.Pedido;
 GO
 
 -- Eliminar únicamente el índice de prueba si ya existe
@@ -48,7 +48,14 @@ BEGIN
 END;
 GO
 
--- Preparación del período de análisis utilizando una tabla temporal de sesión (#PeriodoAnalisis)
+-- Definición del rango de fechas basado en los datos reales existentes
+-- Se establece el rango dinámicamente según la fecha máxima de la tabla
+DECLARE @FechaHasta DATETIME;
+DECLARE @FechaDesde DATETIME;
+
+SELECT @FechaHasta = ISNULL(MAX(fecha_pedido), GETDATE()) FROM dbo.Pedido;
+SET @FechaDesde = DATEADD(DAY, -30, @FechaHasta);
+
 IF OBJECT_ID('tempdb..#PeriodoAnalisis') IS NOT NULL
     DROP TABLE #PeriodoAnalisis;
 
@@ -57,13 +64,10 @@ CREATE TABLE #PeriodoAnalisis(
     FechaHasta DATETIME NOT NULL
 );
 
--- Rango dinámico basado en la fecha máxima registrada en la tabla para asegurar resultados
 INSERT INTO #PeriodoAnalisis (FechaDesde, FechaHasta)
-SELECT DATEADD(DAY, -30, MAX(fecha_pedido)), DATEADD(DAY, 1, MAX(fecha_pedido))
-FROM dbo.Pedido;
-GO
+VALUES (@FechaDesde, @FechaHasta);
 
--- MEDICIÓN 1: Consulta SIN el índice de prueba
+-- Medición 1: Consulta SIN el índice de prueba
 SET STATISTICS IO ON;
 SET STATISTICS TIME ON;
 
@@ -72,18 +76,18 @@ PRINT 'MEDICIÓN 1: CONSULTA SIN EL ÍNDICE DE PRUEBA';
 PRINT '============================================================';
 
 SELECT COUNT_BIG(*) AS CantidadPedidosEntregados_SinIndice
-FROM dbo.Pedido
-CROSS JOIN #PeriodoAnalisis AS P1
+FROM dbo.Pedido WITH (INDEX(0))
+CROSS JOIN #PeriodoAnalisis AS P
 WHERE dbo.Pedido.estado = 'Entregado'
-  AND dbo.Pedido.fecha_pedido >= P1.FechaDesde
-  AND dbo.Pedido.fecha_pedido < P1.FechaHasta
+  AND dbo.Pedido.fecha_pedido >= P.FechaDesde
+  AND dbo.Pedido.fecha_pedido <= P.FechaHasta
 OPTION (RECOMPILE);
 
 SET STATISTICS IO OFF;
 SET STATISTICS TIME OFF;
 GO
 
--- Crear el índice NONCLUSTERED (estado, fecha_pedido) con INCLUDE para el total
+-- Crear el índice NONCLUSTERED optimizado
 IF NOT EXISTS(
     SELECT 1
     FROM sys.indexes
@@ -106,13 +110,10 @@ GO
 UPDATE STATISTICS dbo.Pedido IX_Pedido_Estado_Fecha;
 GO
 
--- MEDICIÓN 2: Consulta CON el índice activo
+-- Medición 2: Consulta CON el índice activo
 IF OBJECT_ID('tempdb..#PeriodoAnalisis') IS NULL
 BEGIN
-    CREATE TABLE #PeriodoAnalisis(FechaDesde DATETIME NOT NULL, FechaHasta DATETIME NOT NULL);
-    INSERT INTO #PeriodoAnalisis (FechaDesde, FechaHasta)
-    SELECT DATEADD(DAY, -30, MAX(fecha_pedido)), DATEADD(DAY, 1, MAX(fecha_pedido))
-    FROM dbo.Pedido;
+    THROW 50003, 'No se encontró el período de análisis. Ejecute el archivo completo en una misma sesión.', 1;
 END;
 
 SET STATISTICS IO ON;
@@ -124,10 +125,10 @@ PRINT '============================================================';
 
 SELECT COUNT_BIG(*) AS CantidadPedidosEntregados_ConIndice
 FROM dbo.Pedido
-CROSS JOIN #PeriodoAnalisis AS P2
+CROSS JOIN #PeriodoAnalisis AS P
 WHERE dbo.Pedido.estado = 'Entregado'
-  AND dbo.Pedido.fecha_pedido >= P2.FechaDesde
-  AND dbo.Pedido.fecha_pedido < P2.FechaHasta
+  AND dbo.Pedido.fecha_pedido >= P.FechaDesde
+  AND dbo.Pedido.fecha_pedido <= P.FechaHasta
 OPTION (RECOMPILE);
 
 SET STATISTICS IO OFF;
@@ -158,7 +159,7 @@ WHERE I.object_id = OBJECT_ID(N'dbo.Pedido')
 ORDER BY I.name, IC.key_ordinal, IC.index_column_id;
 GO
 
--- Limpieza de la tabla temporal de sesión
+-- Limpieza de la tabla temporal
 IF OBJECT_ID('tempdb..#PeriodoAnalisis') IS NOT NULL
     DROP TABLE #PeriodoAnalisis;
 GO
