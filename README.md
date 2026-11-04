@@ -41,3 +41,12 @@ En esta etapa se desarrollan y prueban consultas SQL sobre la base de datos Ener
 
 - [Ver carpeta en `main`](./ETAPA_IV/sql/consultas)
 - [Ir a rama `ETAPA_IV`](https://github.com/NairN23/Energy-BD-equipo45/tree/ETAPA_IV)
+
+## Etapa V - Programación y Administración de Base de Datos
+
+En esta etapa se implementan funcionalidades avanzadas de SQL Server para mejorar la automatización, integridad, seguridad y rendimiento de la base de datos del sistema Energy.
+
+Se incluyen procedimientos y funciones almacenadas, manejo de transacciones, triggers de auditoría, administración de usuarios, roles y permisos, e implementación de índices.
+
+- [Ver carpeta en main](ETAPA_V)
+- [Ir a rama ETAPA_V](../../tree/ETAPA_V)
