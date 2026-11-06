@@ -1,7 +1,4 @@
 /*
-Proyecto Energy - Equipo 45 - Etapa V - Punto 4
-Seguridad: usuarios, roles y permisos
-SQL Server 2022 | Nair Nazer
 Ejecutar en EnergyBD con permisos para crear usuarios, roles y procedimientos.
 Se requieren las tablas de la Etapa III. Las pruebas no alteran registros.
 */
